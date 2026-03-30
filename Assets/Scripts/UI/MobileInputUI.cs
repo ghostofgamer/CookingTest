@@ -16,7 +16,6 @@ namespace UI
         public void Init(MobileInput input)
         {
             mobileInput = input;
-
             jumpButton.onClick.AddListener(() => mobileInput.SetJump(true));
             interactButton.onClick.AddListener(() => mobileInput.SetInteract(true));
             _dropButton.onClick.AddListener(() => mobileInput.SetDrop(true));

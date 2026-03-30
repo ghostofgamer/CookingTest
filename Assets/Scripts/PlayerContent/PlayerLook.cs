@@ -16,7 +16,6 @@ namespace PlayerContent
 
             _xRotation -= mouseY;
             _xRotation = Mathf.Clamp(_xRotation, -80f, 80f);
-
             _cameraPivot.localRotation = Quaternion.Euler(_xRotation, 0f, 0f);
             transform.Rotate(Vector3.up * mouseX);
         }

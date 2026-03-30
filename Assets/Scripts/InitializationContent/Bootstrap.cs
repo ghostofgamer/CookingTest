@@ -41,7 +41,6 @@ namespace InitializationContent
         {
             var factory = new InputFactory();
             _input = factory.Create(_moveJoystick,_lookAreaInput); // должно возвращать MobileInput
-            Debug.Log("Input type: " + _input.GetType());
 
             if (_input is MobileInput mobileInput)
                 _mobileInputUI.Init(mobileInput);

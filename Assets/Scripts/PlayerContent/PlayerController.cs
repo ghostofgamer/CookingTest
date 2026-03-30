@@ -1,4 +1,3 @@
-using InputContent;
 using Interfaces;
 using ItemsContent;
 using UnityEngine;
@@ -9,14 +8,13 @@ namespace PlayerContent
     {
         [SerializeField] private Transform _heldItemPos;
         [SerializeField] private Transform _cameraTransform;
-
-        public BaseItem HeldItem { get; private set; }
-
+        
         private IPlayerInput _input;
         private PlayerMotor _motor;
         private PlayerLook _look;
-        
         private IInteractable _currentInteractable;
+        
+        public BaseItem HeldItem { get; private set; }
 
         private void Update()
         {
@@ -55,21 +53,18 @@ namespace PlayerContent
         public void PickupItem(BaseItem item)
         {
             HeldItem = item;
-
             item.transform.SetParent(_heldItemPos);
             item.transform.localPosition = Vector3.zero;
             item.transform.localRotation = Quaternion.identity;
-
             HeldItem.SetRBValueCollider(true);
         }
 
-        public void DropItem()
+        private void DropItem()
         {
             if (HeldItem == null) return;
 
             BaseItem item = HeldItem;
             item.transform.SetParent(null);
-
             Rigidbody rb = item.GetComponent<Rigidbody>();
 
             if (rb != null)
@@ -81,15 +76,6 @@ namespace PlayerContent
             }
             
             HeldItem = null;
-        }
-
-        public void PlaceItem(IInteractable target)
-        {
-            if (HeldItem != null && target.CanInteract(this))
-            {
-                target.Interact(this);
-                HeldItem = null;
-            }
         }
 
         public void ClearHands()

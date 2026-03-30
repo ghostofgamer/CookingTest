@@ -6,7 +6,6 @@ namespace InputContent
     public class PCInput : IPlayerInput
     {
         private InputSystem_Actions _inputActions;
-        
         private Vector2 _move;
         private Vector2 _look;
         private bool _interact;
@@ -25,7 +24,6 @@ namespace InputContent
             _inputActions.Player.Jump.performed += ctx => _jump = true;
             _inputActions.Player.Drop.started += ctx => _drop = true;
         }
-        
         
         public Vector2 Move => _move;
         public Vector2 Look => _look;

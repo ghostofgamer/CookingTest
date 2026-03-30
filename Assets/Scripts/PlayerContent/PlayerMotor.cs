@@ -34,14 +34,14 @@ namespace PlayerContent
         {
             if (!_controller.isGrounded)
             {
-                if (_velocity.y < 0) // падаем вниз
+                if (_velocity.y < 0)
                     _velocity.y += _gravity * _fallMultiplier * Time.deltaTime;
                 else
                     _velocity.y += _gravity * Time.deltaTime;
             }
             else if (_velocity.y < 0)
             {
-                _velocity.y = -2f; // чтобы CharacterController “прилипал” к земле
+                _velocity.y = -2f;
             }
 
             _controller.Move(_velocity * Time.deltaTime);

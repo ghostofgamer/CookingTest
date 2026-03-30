@@ -53,29 +53,6 @@ namespace KitchenApplianceContent
             }
         }
 
-        /*protected override void ReplaceItemPrefab(BaseItem prefab)
-        {
-            if (CurrentItem == null || prefab == null) return;
-
-            Vector3 pos = CurrentItem.transform.position;
-            Quaternion rot = CurrentItem.transform.rotation;
-
-            Destroy(CurrentItem.gameObject);
-            CurrentItem = Instantiate(prefab, pos, rot, ItemPosition);
-            CurrentItem.SetRBValueCollider(true);
-            CurrentItem.SetValueCollider(false);
-        }*/
-
-        /*protected override void SetItemOnAppliance(BaseItem item)
-        {
-            CurrentItem = item;
-            CurrentItem.SetRBValueCollider(true);
-            CurrentItem.gameObject.transform.SetParent(ItemPosition);
-            CurrentItem.gameObject.transform.localPosition = Vector3.zero;
-            CurrentItem.gameObject.transform.localRotation = Quaternion.identity;
-            CurrentItem.SetValueCollider(false);
-        }*/
-
         private void TryStartProcess(PlayerController player)
         {
             var recipe = GetRecipe(CurrentItem);

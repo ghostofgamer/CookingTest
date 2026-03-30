@@ -13,7 +13,6 @@ public class InteractableObject : MonoBehaviour,IInteractable
     public void Interact(PlayerController player)
     {
         Action?.Invoke(player);
-        Debug.Log("Interacting with player " + gameObject.name);
     }
 
     public bool CanInteract(PlayerController player)

@@ -43,21 +43,6 @@ namespace KitchenApplianceContent
             return _recipes.Find(r => r.ItemType == item.Data.Type);
         }
 
-        // protected abstract void ReplaceItemPrefab(BaseItem prefab);
-        
-        private void ReplaceItemPrefab(BaseItem prefab)
-        {
-            if (CurrentItem == null || prefab == null) return;
-
-            Vector3 pos = CurrentItem.transform.position;
-            Quaternion rot = CurrentItem.transform.rotation;
-
-            Destroy(CurrentItem.gameObject);
-            CurrentItem = Instantiate(prefab, pos, rot, ItemPosition);
-            CurrentItem.SetRBValueCollider(true);
-            CurrentItem.SetValueCollider(false);
-        }
-
         protected virtual void SetItemOnAppliance(BaseItem item)
         {
             CurrentItem = item;
@@ -69,7 +54,7 @@ namespace KitchenApplianceContent
         }
 
         protected abstract void OnAction(PlayerController player);
-        
+
         protected void StartProcess(CookingRecipe recipe)
         {
             CurrentRecipe = recipe;
@@ -77,51 +62,6 @@ namespace KitchenApplianceContent
             Cts = new CancellationTokenSource();
 
             RunProcess(Cts.Token).Forget();
-        }
-        
-        protected async UniTaskVoid RunProcess(CancellationToken token)
-        {
-            State = TaskState.InProgress;
-            _canvasGroup.alpha = 1f;
-            _particleSystem?.Play();
-            _fillImage.fillAmount = 0f;
-
-            float startTime = Time.time;
-
-            while (true)
-            {
-                float elapsed = Time.time - startTime;
-                float progress = 0f;
-
-                if (elapsed < CurrentRecipe.WarningTime)
-                {
-                    State = TaskState.InProgress;
-                    progress = Mathf.InverseLerp(0f, CurrentRecipe.WarningTime, elapsed);
-                    _statusText.text = CurrentRecipe.StartText;
-                }
-                else if (elapsed < CurrentRecipe.Duration)
-                {
-                    State = TaskState.Warning;
-                    progress = Mathf.InverseLerp(CurrentRecipe.WarningTime, CurrentRecipe.Duration, elapsed);
-                    _statusText.text = CurrentRecipe.WarningText;
-                }
-                else if (elapsed < CurrentRecipe.FailTime)
-                {
-                    State = TaskState.Completed;
-                    progress = Mathf.InverseLerp(CurrentRecipe.Duration, CurrentRecipe.FailTime, elapsed);
-                    _statusText.text = CurrentRecipe.DoneText;
-                }
-                else
-                {
-                    State = TaskState.Failed;
-                    progress = 1f;
-                    _statusText.text = CurrentRecipe.FailText;
-                }
-
-                _fillImage.fillAmount = progress;
-
-                await UniTask.Yield(token);
-            }
         }
 
         protected void StopProcess()
@@ -148,6 +88,83 @@ namespace KitchenApplianceContent
             CurrentRecipe = null;
             State = TaskState.Idle;
             IsReadyToTake = false;
+        }
+
+        private void ReplaceItemPrefab(BaseItem prefab)
+        {
+            if (CurrentItem == null || prefab == null) return;
+
+            Vector3 pos = CurrentItem.transform.position;
+            Quaternion rot = CurrentItem.transform.rotation;
+
+            Destroy(CurrentItem.gameObject);
+            CurrentItem = Instantiate(prefab, pos, rot, ItemPosition);
+            CurrentItem.SetRBValueCollider(true);
+            CurrentItem.SetValueCollider(false);
+        }
+
+        private async UniTaskVoid RunProcess(CancellationToken token)
+        {
+            State = TaskState.InProgress;
+            _canvasGroup.alpha = 1f;
+            _particleSystem?.Play();
+            _fillImage.fillAmount = 0f;
+
+            float startTime = Time.time;
+
+            while (true)
+            {
+                float elapsed = Time.time - startTime;
+                float progress = 0f;
+
+                if (elapsed < CurrentRecipe.WarningTime)
+                {
+                    State = TaskState.InProgress;
+                    progress = Mathf.InverseLerp(0f, CurrentRecipe.WarningTime, elapsed);
+                    _statusText.text = CurrentRecipe.StartText;
+                    SetVisual(Color.yellow, false);
+                }
+                else if (elapsed < CurrentRecipe.Duration)
+                {
+                    State = TaskState.Warning;
+                    progress = Mathf.InverseLerp(CurrentRecipe.WarningTime, CurrentRecipe.Duration, elapsed);
+                    _statusText.text = CurrentRecipe.WarningText;
+                    SetVisual(Color.green, false);
+                }
+                else if (elapsed < CurrentRecipe.FailTime)
+                {
+                    State = TaskState.Completed;
+                    progress = Mathf.InverseLerp(CurrentRecipe.Duration, CurrentRecipe.FailTime, elapsed);
+                    _statusText.text = CurrentRecipe.DoneText;
+                    SetVisual(Color.red, true);
+                }
+                else
+                {
+                    State = TaskState.Failed;
+                    progress = 1f;
+                    _statusText.text = CurrentRecipe.FailText;
+                }
+
+                _fillImage.fillAmount = progress;
+
+                await UniTask.Yield(token);
+            }
+        }
+        
+        private void SetVisual(Color color, bool pulse)
+        {
+            _fillImage.color = color;
+
+            if (pulse)
+            {
+                float pulseValue = Mathf.PingPong(Time.time * 3f, 1f);
+                float scale = 1f + pulseValue * 0.15f;
+                _canvasGroup.transform.localScale = new Vector3(scale, scale, scale);
+            }
+            else
+            {
+                _canvasGroup.transform.localScale = Vector3.one;
+            }
         }
     }
 }

@@ -1,6 +1,5 @@
 using Interfaces;
 using UnityEngine;
-using TouchPhase = UnityEngine.TouchPhase;
 
 namespace InputContent
 {
@@ -21,7 +20,6 @@ namespace InputContent
         {
             _moveJoystick = moveJoystick;
             _lookInput = lookInput;
-            Debug.Log($"MobileInput created. LookArea: {_lookInput}, MoveJoystick: {_moveJoystick}");
         }
 
         public Vector2 Move => _moveJoystick != null ? _moveJoystick.Direction : Vector2.zero;
