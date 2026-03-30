@@ -3,9 +3,9 @@ namespace Enum
     public enum TaskState
     {
         Idle,
-        Running,
+        InProgress,
         Warning,
-        Error,
-        Done,
+        Failed,
+        Completed,
     }
 }

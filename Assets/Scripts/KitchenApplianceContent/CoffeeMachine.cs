@@ -1,56 +1,92 @@
-using Cysharp.Threading.Tasks;
+using AttentionContent;
+using Enum;
 using PlayerContent;
-using SOContent;
-using TMPro;
-using UnityEngine;
-using UnityEngine.UI;
 
 namespace KitchenApplianceContent
 {
     public class CoffeeMachine : KitchenAppliance
     {
-        [SerializeField] private CoffeeMachineConfig _coffeeMachineConfig;
-        [SerializeField] private Image _fillImage; // UI Fill сверху
-        [SerializeField] private TMP_Text _statusText;
-        [SerializeField]private CanvasGroup _canvasGroup;
-        [SerializeField]private ParticleSystem _particleSystem;
-        
-        private bool _isBrewing = false;
-        private float _timer = 0f;
-        
         protected override void OnAction(PlayerController playerController)
         {
-            if (_isBrewing)
+            if (State == TaskState.InProgress || State == TaskState.Warning)
             {
-                AttentionContent.AttentionHintActivator.ShowHint("Кофе уже варится!");
+                AttentionHintActivator.ShowHint("Кофе готовится...");
                 return;
             }
 
-            StartBrewingAsync().Forget(); 
-        }
-
-        private async UniTaskVoid StartBrewingAsync()
-        {
-            _particleSystem.Play();
-            _canvasGroup.alpha = 1f;
-            _isBrewing = true;
-            _fillImage.fillAmount = 0f;
-            _statusText.text = "Варится ...";
-
-            float timer = 0f;
-            float brewTime = _coffeeMachineConfig.Duration;
-
-            while (timer < brewTime)
+            if ((State == TaskState.Completed || State == TaskState.Failed) && !IsReadyToTake)
             {
-                timer += Time.deltaTime;
-                _fillImage.fillAmount = Mathf.Clamp01(timer / brewTime);
-                await UniTask.Yield();
+                StopProcess();
+                IsReadyToTake = true;
+                return;
             }
 
-            _fillImage.fillAmount = 1f;
-            _statusText.text = "Готово! Забирай кофе";
-            _particleSystem.Stop();
-            _isBrewing = false;
+            if (CurrentItem == null)
+            {
+                var held = playerController.HeldItem;
+
+                if (held == null || held.Data.Type != ItemType.CupEmpty)
+                {
+                    AttentionHintActivator.ShowHint("Нужен пустой стакан");
+                    return;
+                }
+
+                SetItemOnAppliance(held);
+                playerController.ClearHands();
+                return;
+            }
+
+            if (CurrentItem.Data.Type == ItemType.CupEmpty)
+            {
+                if (State == TaskState.Idle)
+                    TryStartProcess(playerController);
+            }
+            else
+            {
+                if (State == TaskState.Completed || State == TaskState.Failed )
+                {
+                    if (playerController.HeldItem == null)
+                        TakeResult(playerController);
+                    else
+                        AttentionHintActivator.ShowHint("Освободи руки чтобы взять !");
+                }
+            }
+        }
+
+        /*protected override void ReplaceItemPrefab(BaseItem prefab)
+        {
+            if (CurrentItem == null || prefab == null) return;
+
+            Vector3 pos = CurrentItem.transform.position;
+            Quaternion rot = CurrentItem.transform.rotation;
+
+            Destroy(CurrentItem.gameObject);
+            CurrentItem = Instantiate(prefab, pos, rot, ItemPosition);
+            CurrentItem.SetRBValueCollider(true);
+            CurrentItem.SetValueCollider(false);
+        }*/
+
+        /*protected override void SetItemOnAppliance(BaseItem item)
+        {
+            CurrentItem = item;
+            CurrentItem.SetRBValueCollider(true);
+            CurrentItem.gameObject.transform.SetParent(ItemPosition);
+            CurrentItem.gameObject.transform.localPosition = Vector3.zero;
+            CurrentItem.gameObject.transform.localRotation = Quaternion.identity;
+            CurrentItem.SetValueCollider(false);
+        }*/
+
+        private void TryStartProcess(PlayerController player)
+        {
+            var recipe = GetRecipe(CurrentItem);
+
+            if (recipe == null)
+            {
+                AttentionHintActivator.ShowHint("Это не подходит для кофе");
+                return;
+            }
+
+            StartProcess(recipe);
         }
     }
 }

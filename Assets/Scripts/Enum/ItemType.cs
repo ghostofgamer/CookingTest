@@ -5,6 +5,14 @@ namespace Enum
         Empty,
         Egg,
         Meat,
-        Fruit
+        Fruit,
+        CupEmpty,
+        ChickenRaw,
+        FriedEggs,
+        CupCoffee,
+        SpoiledCoffee,
+        BurntEgg,
+        ChickenFried,
+        ChickenBurned,
     }
 }

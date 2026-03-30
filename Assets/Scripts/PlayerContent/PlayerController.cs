@@ -70,14 +70,7 @@ namespace PlayerContent
             item.transform.localPosition = Vector3.zero;
             item.transform.localRotation = Quaternion.identity;
 
-            Rigidbody rb = item.GetComponent<Rigidbody>();
-            
-            if (rb != null)
-            {
-                rb.isKinematic = true;
-                rb.linearVelocity = Vector3.zero;
-                rb.angularVelocity = Vector3.zero;
-            }
+            HeldItem.SetRBValueCollider(true);
         }
 
         public void DropItem()
@@ -91,11 +84,12 @@ namespace PlayerContent
 
             if (rb != null)
             {
-                rb.isKinematic = false;
+                HeldItem.SetValueCollider(true);
+                HeldItem.SetRBValueCollider(false);
                 Vector3 throwDir = _cameraTransform.forward + Vector3.up * 0.3f;
                 rb.AddForce(throwDir * 5f, ForceMode.Impulse);
             }
-
+            
             HeldItem = null;
         }
 
@@ -106,6 +100,11 @@ namespace PlayerContent
                 target.Interact(this);
                 HeldItem = null;
             }
+        }
+
+        public void ClearHands()
+        {
+            HeldItem = null;
         }
     }
 }
