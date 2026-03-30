@@ -1,19 +1,16 @@
 using Interfaces;
-using UnityEngine;
 
 namespace InputContent
 {
     public class InputFactory
     {
-        public IPlayerInput Create(Joystick moveJoystick, RectTransform lookArea)
+        public IPlayerInput Create(Joystick moveJoystick, LookAreaInput lookAreaInput)
         {
+#if UNITY_EDITOR
             return new PCInput();
-            
-#if UNITY_ANDROID || UNITY_IOS
-            Debug.Log("InputFactory::Create");
-            return new MobileInput(moveJoystick, lookArea);
+
 #else
-        return new PCInput();
+ return new MobileInput(moveJoystick,lookAreaInput);
 #endif
         }
     }

@@ -12,11 +12,11 @@ namespace InitializationContent
     public class Bootstrap : MonoBehaviour
     {
         [SerializeField] private Joystick _moveJoystick;
-        [SerializeField] private RectTransform _lookArea;
         [SerializeField] private GameObject _playerPrefab;
         [SerializeField] private LoadingScreen _loadingScreen;
         [SerializeField] private MobileInputUI _mobileInputUI;
         [SerializeField] private AttentionHintViewer _attentionHintViewer;
+        [SerializeField]private LookAreaInput _lookAreaInput;
         
         private IPlayerInput _input;
         private PlayerController _playerController;
@@ -40,7 +40,7 @@ namespace InitializationContent
         private void InitInput()
         {
             var factory = new InputFactory();
-            _input = factory.Create(_moveJoystick, _lookArea); // должно возвращать MobileInput
+            _input = factory.Create(_moveJoystick,_lookAreaInput); // должно возвращать MobileInput
             Debug.Log("Input type: " + _input.GetType());
 
             if (_input is MobileInput mobileInput)

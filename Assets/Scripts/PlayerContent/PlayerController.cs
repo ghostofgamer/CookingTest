@@ -20,28 +20,18 @@ namespace PlayerContent
 
         private void Update()
         {
-            if (_input is MobileInput mobile)
-                mobile.UpdateInput();
-
             _motor.Move(_input.Move);
             _look.Look(_input.Look);
-
             _motor.ApplyGravity();
 
             if (_input.JumpPressed)
                 _motor.Jump();
 
             if (_input.InteractPressed)
-            {
-                Debug.Log("Interact!");
                 TryInteract();
-            }
             
             if (_input.DropPressed)
-            {
-                Debug.Log("Drop!");
                 DropItem();
-            }
         }
 
         public void SetInteractable(IInteractable interactable)

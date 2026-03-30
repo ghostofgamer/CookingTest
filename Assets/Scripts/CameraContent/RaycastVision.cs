@@ -11,6 +11,8 @@ namespace CameraContent
         [SerializeField] private PlayerController _playerController;
 
         private IInteractable _currentInteractable;
+        private Ray _ray;
+        private  RaycastHit _hit; 
 
         private void FixedUpdate()
         {
@@ -19,12 +21,11 @@ namespace CameraContent
 
         private void CheckOutline()
         {
-            Ray ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
-            RaycastHit hit;
+            _ray = new Ray(Camera.main.transform.position, Camera.main.transform.forward);
 
-            if (Physics.Raycast(ray, out hit, _maxDistance, _interactableLayer))
+            if (Physics.Raycast(_ray, out _hit, _maxDistance, _interactableLayer))
             {
-                IInteractable interactable = hit.collider.GetComponent<IInteractable>();
+                IInteractable interactable = _hit.collider.GetComponent<IInteractable>();
 
                 if (interactable != null)
                 {
